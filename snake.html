@@ -40,20 +40,16 @@
                     ctx.fillText(`Score: ${score}`, canvas.width/2,(canvas.height/2)+40);
                     ctx.font = "20px Arial";
                     ctx.fillText(`Press any key to go again`, canvas.width/2,(canvas.height/2)+70);
-                    if(reset){
-                            px=py=12;
-                            gs=tc=24;
-                            ax=ay=10;
-                            xv=yv=0;
-                            trail=[];
-                            tail = 5;
-                            score = 0;
-                            uturn = false
-                            gameOver = false;
-                            hasMoved = false;
-                            reset = false;
-                            uturnv=[];
-                    }
+                    px=py=12;
+                    gs=tc=24;
+                    ax=ay=10;
+                    xv=yv=0;
+                    trail=[];
+                    tail = 5;
+                    score = 0;
+                    uturn = false
+                    hasMoved = false;
+                    uturnv=[];
                 }
 
             else{
@@ -116,7 +112,7 @@
                     xv=0;yv=1;
                     break;
                 default:
-                    reset = true;
+                    gameOver = false;
                     break;
         }
     }
