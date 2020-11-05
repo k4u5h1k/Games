@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<canvas id="canvas" width="864" height="650"></canvas>
+<script>
+var cvs = document.getElementById("canvas");
+var ctx = cvs.getContext("2d");
+
+// load images
+
+var bird= new Image();
+var downwards = new Image();
+var upwards = new Image();
+var bg = new Image();
+var fg = new Image();
+var pipeNorth = new Image();
+var pipeSouth = new Image();
+
+bird.src = "assets/flappy/images/bird.png";
+downwards.src = "assets/flappy/images/downwards_bird.png";
+upwards.src = "assets/flappy/images/upwards_bird.png";
+bg.src = "assets/flappy/images/newbg.png";
+fg.src = "assets/flappy/images/newfg.png";
+pipeNorth.src = "assets/flappy/images/pipeNorth.png";
+pipeSouth.src = "assets/flappy/images/pipeSouth.png";
+
+
+// some variables
+
+var gap = 100;
+var constant;
+
+var bX = 10;
+var bY = 150;
+
+var gravity = 0.25;
+var velocity = 0;
+
+var score = 0;
+
+var orientation = downwards;
+
+// audio files
+
+var fly_sound = new Audio();
+var score_sound = new Audio();
+
+fly_sound.src = "assets/flappy/sounds/fly.mp3";
+score_sound.src = "assets/flappy/sounds/score.mp3";
+
+// on key down
+
+document.addEventListener("keydown",moveUp);
+
+function moveUp(){
+    if(crashed){
+        bY = 150;
+        velocity = 0;
+        crashed = 0;
+        score = 0;
+        pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
+        draw();
+    }
+
+    else{
+    velocity = -5;
+    fly_sound.play();
+    }
+}
+
+// pipe coordinates
+
+var pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
+
+
+crashed = false;
+// draw images
+
+function draw(){
+    
+    ctx.drawImage(bg,0,0);
+
+    if(velocity<0){
+        orientation = upwards;
+    }
+    else{
+        orientation = downwards;
+    }
+
+    ctx.drawImage(orientation,bX,bY);
+    
+    
+    for(var i = 0; i < pipe.length; i++){
+
+        constant = pipeNorth.height+gap;
+        ctx.drawImage(pipeNorth,pipe[i].x,pipe[i].y);
+        ctx.drawImage(pipeSouth,pipe[i].x,pipe[i].y+constant);
+        pipe[i].x--;
+        
+        if( pipe.slice(-1).pop().x < canvas.width*3/4 ){
+            pipe.push({
+                x : cvs.width,
+                y : Math.floor(Math.random()*pipeNorth.height)-pipeNorth.height
+            }); 
+            if(pipe.slice(-1).pop().y < -10)pipe[pipe.length-1].y+=10;
+        }
+
+        // detect collision
+        
+        if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height){
+            crashed = true;
+        }
+        
+        if(pipe[i].x == 5){
+            score++;
+            score_sound.play();
+        }
+    }
+
+    ctx.drawImage(fg,0,cvs.height - fg.height);
+
+    
+    bY += velocity;
+    velocity += gravity
+
+    ctx.fillStyle = "#000";
+    ctx.font = "20px Verdana";
+
+    if(!crashed){
+        ctx.fillText("Score : "+score,10,cvs.height-20);
+    }
+    
+    if(crashed){
+        ctx.fillText("GAME OVER",10,cvs.height-20);
+        return;
+    }
+
+    requestAnimationFrame(draw);
+}
+
+draw();
+</script>
