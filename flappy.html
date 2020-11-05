@@ -32,7 +32,7 @@ var gravity = 0.25;
 var velocity = 0;
 var score = 0;
 var gameOver=gameStarted=false;
-var orientation = downwards;
+var orientation;
 
 var fly_sound = new Audio();
 var score_sound = new Audio();
@@ -42,21 +42,27 @@ score_sound.src = "assets/flappy/sounds/score.mp3";
 
 document.addEventListener("keydown",moveUp);
 
+function reset(){
+    bY = 150;
+    velocity = 0;
+    score = 0;
+    pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
+    gameOver = gameStarted = false;
+}
+
+
+
 function moveUp(){
     if(!gameStarted) gameStarted = true;
 
     if(gameOver){
-        bY = 150;
-        velocity = 0;
-        score = 0;
-        pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
-        gameOver = false
+        reset();
         draw();
     }
 
     else{
-    velocity = -5;
-    fly_sound.play();
+        velocity = -5;
+        fly_sound.play();
     }
 }
 
@@ -69,7 +75,11 @@ function draw(){
     if(gameOver){
         ctx.drawImage(gameOver_splash,cvs.width/2-title.width/2,100);
         ctx.drawImage(fg,0,cvs.height - fg.height);
-        ctx.font = "50px Times";
+        ctx.font = "50px Arial";
+        ctx.strokeStyle="white";
+        ctx.lineWidth = 3;
+        ctx.fillStyle = "orange";
+        ctx.strokeText("Score : "+score,cvs.width/2,330);
         ctx.fillText("Score : "+score,cvs.width/2,330);
         return;
     }
@@ -95,21 +105,21 @@ function draw(){
             constant = pipeNorth.height+gap;
             ctx.drawImage(pipeNorth,pipe[i].x,pipe[i].y);
             ctx.drawImage(pipeSouth,pipe[i].x,pipe[i].y+constant);
-            pipe[i].x--;
+            pipe[i].x-=2;
             
             if( pipe.slice(-1).pop().x < canvas.width*3/4 ){
                 pipe.push({
                     x : cvs.width,
                     y : Math.floor(Math.random()*pipeNorth.height)-pipeNorth.height
                 }); 
-                if(pipe.slice(-1).pop().y < -10)pipe[pipe.length-1].y+=10;
+                if(pipe[pipe.length-1].y < -10)pipe[pipe.length-1].y+=10;
             }
 
             if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height){
                 gameOver = true;
             }
             
-            if(pipe[i].x == 5){
+            if(pipe[i].x == 4-bird.width){
                 score++;
                 score_sound.play();
             }
@@ -120,11 +130,14 @@ function draw(){
         bY += velocity;
         velocity += gravity
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "green";
+        ctx.strokeStyle="LightGreen";
         ctx.textAlign = "center";
-        ctx.font = "30px Arial";
+        ctx.lineWidth = 1;
+        ctx.font = "40px Arial";
 
-        ctx.fillText("Score : "+score,cvs.width/2,30);
+        ctx.fillText("Score : "+score,cvs.width/2,cvs.height-10);
+        ctx.strokeText("Score : "+score,cvs.width/2,cvs.height-10);
         
     }
     requestAnimationFrame(draw);
