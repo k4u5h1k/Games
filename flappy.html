@@ -12,6 +12,7 @@ var fg = new Image();
 var pipeNorth = new Image();
 var pipeSouth = new Image();
 var title = new Image();
+var gameOver_splash = new Image();
 
 bird.src = "assets/flappy/images/bird.png";
 downwards.src = "assets/flappy/images/downwards_bird.png";
@@ -20,7 +21,8 @@ bg.src = "assets/flappy/images/newbg.png";
 fg.src = "assets/flappy/images/newfg.png";
 pipeNorth.src = "assets/flappy/images/pipeNorth.png";
 pipeSouth.src = "assets/flappy/images/pipeSouth.png";
-title.src = "assets/flappy/images/title.png";
+title.src = "assets/flappy/images/new_title.png";
+gameOver_splash.src = "assets/flappy/images/gameOver.png";
 
 var gap = 120;
 var constant;
@@ -43,12 +45,12 @@ document.addEventListener("keydown",moveUp);
 function moveUp(){
     if(!gameStarted) gameStarted = true;
 
-    if(crashed){
+    if(gameOver){
         bY = 150;
         velocity = 0;
-        crashed = 0;
         score = 0;
         pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
+        gameOver = false
         draw();
     }
 
@@ -60,11 +62,17 @@ function moveUp(){
 
 var pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
 
-crashed = false;
-
 function draw(){
     
     ctx.drawImage(bg,0,0);
+
+    if(gameOver){
+        ctx.drawImage(gameOver_splash,cvs.width/2-title.width/2,100);
+        ctx.drawImage(fg,0,cvs.height - fg.height);
+        ctx.font = "50px Times";
+        ctx.fillText("Score : "+score,cvs.width/2,330);
+        return;
+    }
 
     if(!gameStarted){
         ctx.drawImage(title,cvs.width/2-title.width/2,100);
@@ -98,7 +106,7 @@ function draw(){
             }
 
             if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height){
-                crashed = true;
+                gameOver = true;
             }
             
             if(pipe[i].x == 5){
@@ -116,15 +124,8 @@ function draw(){
         ctx.textAlign = "center";
         ctx.font = "30px Arial";
 
-        if(!crashed){
-            ctx.fillText("Score : "+score,cvs.width/2,30);
-        }
+        ctx.fillText("Score : "+score,cvs.width/2,30);
         
-        if(crashed){
-            ctx.fillText("GAME OVER",cvs.width/2,30);
-            return;
-        }
-
     }
     requestAnimationFrame(draw);
 }
