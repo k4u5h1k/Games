@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <canvas id="canvas" width="864" height="650"></canvas>
 <script>
 var cvs = document.getElementById("canvas");
@@ -24,42 +23,37 @@ pipeSouth.src = "assets/flappy/images/pipeSouth.png";
 title.src = "assets/flappy/images/new_title.png";
 gameOver_splash.src = "assets/flappy/images/gameOver.png";
 
-var gap = 120;
-var constant;
-var bX = 10;
-var bY = 150;
-var gravity = 0.25;
-var velocity = 0;
-var score = 0;
-var gameOver=gameStarted=false;
-var orientation;
-
 var fly_sound = new Audio();
 var score_sound = new Audio();
 
 fly_sound.src = "assets/flappy/sounds/fly.mp3";
 score_sound.src = "assets/flappy/sounds/score.mp3";
 
+var gap = 100;
+var constant;
+var bX = 10;
+var bY = 150;
+var gravity = 0.25;
+var velocity = score = highscore = framecount = 0;
+var gameOver = gameStarted = false;
+var orientation;
+var newHighScore = false;
+
+
 document.addEventListener("keydown",moveUp);
 
 function reset(){
     bY = 150;
-    velocity = 0;
-    score = 0;
+    newHighScore = false;
+    velocity = score = highscore = framecount = 0;
     pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
     gameOver = gameStarted = false;
+    draw();
 }
-
-
 
 function moveUp(){
     if(!gameStarted) gameStarted = true;
-
-    if(gameOver){
-        reset();
-        draw();
-    }
-
+    if(gameOver) reset();
     else{
         velocity = -5;
         fly_sound.play();
@@ -79,8 +73,10 @@ function draw(){
         ctx.strokeStyle="white";
         ctx.lineWidth = 3;
         ctx.fillStyle = "orange";
-        ctx.strokeText("Score : "+score,cvs.width/2,330);
-        ctx.fillText("Score : "+score,cvs.width/2,330);
+        ctx.strokeText("Your Score : "+score,cvs.width/2,330);
+        ctx.fillText("Your Score : "+score,cvs.width/2,330);
+        ctx.strokeText("High Score : "+highscore,cvs.width/2,390);
+        ctx.fillText("High Score : "+highscore,cvs.width/2,390);
         return;
     }
 
@@ -90,13 +86,8 @@ function draw(){
     }
 
     else{
-
-        if(velocity<0){
-            orientation = upwards;
-        }
-        else{
-            orientation = downwards;
-        }
+        if(velocity<0) orientation = upwards;
+        else           orientation = downwards;
 
         ctx.drawImage(orientation,bX,bY);
         
@@ -112,15 +103,19 @@ function draw(){
                     x : cvs.width,
                     y : Math.floor(Math.random()*pipeNorth.height)-pipeNorth.height
                 }); 
-                if(pipe[pipe.length-1].y < -10)pipe[pipe.length-1].y+=10;
+                if(pipe[pipe.length-1].y < -10) pipe[pipe.length-1].y+=10;
             }
 
-            if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height){
+            if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (
+                bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height)
                 gameOver = true;
-            }
             
             if(pipe[i].x == 4-bird.width){
                 score++;
+                if(score>highscore){
+                    newHighScore = true;
+                    highscore = score;
+                }
                 score_sound.play();
             }
         }
@@ -138,7 +133,12 @@ function draw(){
 
         ctx.fillText("Score : "+score,cvs.width/2,cvs.height-10);
         ctx.strokeText("Score : "+score,cvs.width/2,cvs.height-10);
-        
+
+        if(newHighScore && framecount<200){
+            ctx.fillStyle = "white";
+            ctx.fillText("New High Score!",cvs.width/2,50);
+            framecount++;
+        }
     }
     requestAnimationFrame(draw);
 }
