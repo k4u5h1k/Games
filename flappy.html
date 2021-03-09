@@ -25,9 +25,11 @@ gameOver_splash.src = "assets/flappy/images/gameOver.png";
 
 var fly_sound = new Audio();
 var score_sound = new Audio();
+var crash_sound = new Audio();
 
 fly_sound.src = "assets/flappy/sounds/fly.mp3";
 score_sound.src = "assets/flappy/sounds/score.mp3";
+crash_sound.src = "assets/flappy/sounds/crash.mp3";
 
 var gap = 100;
 var constant;
@@ -39,13 +41,12 @@ var gameOver = gameStarted = false;
 var orientation;
 var newHighScore = false;
 
-
 document.addEventListener("keydown",moveUp);
 
 function reset(){
     bY = 150;
     newHighScore = false;
-    velocity = score = highscore = framecount = 0;
+    velocity = score = framecount = 0;
     pipe = [{x: Math.floor(cvs.width*3/4), y: 0}];
     gameOver = gameStarted = false;
     draw();
@@ -107,8 +108,10 @@ function draw(){
             }
 
             if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (
-                bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height)
+                bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height)            {
                 gameOver = true;
+                crash_sound.play();
+            }
             
             if(pipe[i].x == 4-bird.width){
                 score++;
