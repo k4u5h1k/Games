@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>drift</title>
+  <title>drive</title>
   <meta name="author" content="">
   <style>
   html, body{
@@ -19,7 +19,6 @@
     <div style = "text-align:center;">
         <canvas id="canvas"></canvas>
     </div>
-
     <script>
         var cvs = document.getElementById("canvas");
         var ctx = cvs.getContext("2d");
@@ -31,9 +30,9 @@
 
         var car= new Image();
         var rev_car= new Image();
-
         car.src = "assets/drift/car.png";
         rev_car.src = "assets/drift/reverse_car.png";
+
         xpos = cvs.width/2-25
         ypos = cvs.height/2-47
         PI = 3.1415
@@ -44,8 +43,6 @@
         hei = 95
         friction_counter = 0
         reverse = false
-
-        tire_marks = []
 
         function game(){
             //FRICTION
@@ -102,7 +99,7 @@
                     switch(i) {
                         /* 37->Left; 38-> Up; 39-> Right; 40->Down */
                         case 37:
-                            if(xvel==ZEROx && yvel==ZEROy)break;
+                            if(Math.abs(xvel-ZEROx)<0.01 && Math.abs(yvel-ZEROy)<0.01)break;
                             if(reverse){
                                 xvel+=unit_y;
                                 yvel+=-unit_x;
@@ -126,7 +123,7 @@
                             }
                             break;
                         case 39:
-                            if(xvel==ZEROx && yvel==ZEROy)break;
+                            if(Math.abs(xvel-ZEROx)<0.01 && Math.abs(yvel-ZEROy)<0.01)break;
                             if(reverse){
                                 xvel+=-unit_y;
                                 yvel+=unit_x;
@@ -137,12 +134,10 @@
                             }
                             break;
                         case 40:
-                            <!-- //console.log(xvel, yvel) -->
                            if(!reverse){
                                xvel-=unit_x;
                                yvel-=unit_y;
                                if((xvel>0)^(ZEROx>0) || (yvel>0)^(ZEROy>0)){
-                                   console.log(yvel,unit_y,xvel,unit_x);
                                    reverse = true
                                }
                            }
