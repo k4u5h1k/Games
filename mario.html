@@ -26,14 +26,18 @@
         ctx.canvas.height = window.innerHeight;
         document.addEventListener("keydown",keyPush);
         document.addEventListener("keyup",keyUp);
-        gameInterval = setInterval(game,1000/10);
+        gameInterval = setInterval(game,1000/12);
 
         var mario= new Image();
         var mario_flip= new Image();
         var bg= new Image();
+
         mario.src = "assets/mario/smb2_heroes_sheet.png";
         mario_flip.src = "assets/mario/smb2_heroes_sheet_flipped.png";
         bg.src = "assets/mario/bg.png";
+
+        var jump = new Audio();
+        jump.src = "assets/mario/smb2_jump.wav"
 
         m_w = 18;
         m_h = 27;
@@ -46,13 +50,126 @@
         ground_height = 75;
         xpos = cvs.width/2-25
         ypos = cvs.height-scale_ratio*m_h-cvs.height*8/100;
+        y_on_g = ypos;
 
-        action = 0;
+        xvel=0
+        yvel=0
+
+        frame = 1
+        action = 1;
         /* standing : 0
         running left: 1
         running right: 2
         jumping: 3
         */
+
+
+        image = mario;
+
+        //drawImage(image, x inside image, y ' ', width to crop, height ' ', x on canvas, y ' ', width on canvas, height ' ')
+        function game(){
+            ctx.drawImage(bg, 0, 0, cvs.width, cvs.height);
+
+            xpos += xvel;
+            ypos += yvel;
+
+            if(xvel>0){
+                xvel-=4;
+                xvel = xvel>0?xvel:0;
+            }
+            else if(xvel<0){
+                xvel+=4;
+                xvel = xvel<0?xvel:0;
+            }
+
+            if(ypos<y_on_g){
+                yvel+=10
+                ypos = ypos>y_on_g?y_on_g:ypos;
+            }
+            else if(jumped){
+                jumped=0;
+                yvel=0
+                if(image==mario){
+                    frame=3;
+                }
+                else{
+                    frame=11;
+                }
+            }
+
+            draw_sprite()
+
+            checkfor = [37, 38, 39, 40, 32];
+            for(i=0;i<5;i++){
+                if(map[checkfor[i]]){
+                    switch(checkfor[i]){
+                    /* 37->Left; 38-> Up; 39-> Right; 40->Down */
+                        case 32:
+                            if(!jumped){
+                                yvel=-50;
+                                jump.play();
+                                jumped=1
+                            }
+
+                            if(action==-1){
+                                if(image==mario){
+                                    frame=6
+                                }
+                                else{
+                                    frame=8;
+                                }
+                            }
+                            else{
+                                frame=7
+                            }
+
+                            break;
+                        case 37:
+                            if(!jumped)
+                                frame = frame==3?4:3;
+                            xvel=-20;
+                            action=1;
+                            image = mario;
+                            break;
+                        case 39:
+                            if(!jumped)
+                            frame = frame==10?11:10;
+                            xvel=20;
+                            action=2;
+                            image = mario_flip;
+                            break;
+                    }
+                }
+            }
+        }
+
+        function draw_sprite(){
+            ctx.drawImage(image, 
+              (16*frame+14*frame)-4, 
+              m_vert_sp, 
+              m_w+4, 
+              m_h, 
+              xpos, 
+              ypos, 
+              scale_ratio*(m_w+4), 
+              scale_ratio*m_h);
+        }
+
+        map=[]
+        jumped = 0
+        function keyPush(evt){
+            evt = evt || event;
+            map[evt.keyCode] = evt.type == "keydown";
+        }
+
+        function keyUp(evt){
+                evt = evt || event;
+                map[evt.keyCode] = false;
+                if(evt.keyCode==37||evt.keyCode==39){
+                    action=-1;
+                    frame=frame==4?3:frame==10?11:frame;
+                }
+        }
 
         function sample_print_sprites(){
             x = 0;
@@ -70,70 +187,6 @@
               x = x+w_l;
           }
         }
-
-        frame = 0
-        //drawImage(image, x inside image, y ' ', width to crop, height ' ', x on canvas, y ' ', width on canvas, height ' ')
-        function game(){
-          ctx.drawImage(bg, 0, 0, cvs.width, cvs.height);
-          draw_sprite()
-        }
-
-        function draw_sprite(){
-            image = mario;
-            console.log(action);
-            if(action==0){
-                frame=1
-            }
-            else if(action==1){
-                frame = frame==3?4:3;
-            }
-            else if(action==2){
-                frame = frame==10?11:10;
-                image = mario_flip;
-            }
-            console.log(image)
-            ctx.drawImage(image, 
-              (16*frame+14*frame)-4, 
-              m_vert_sp, 
-              m_w+4, 
-              m_h, 
-              xpos, 
-              ypos, 
-              scale_ratio*(m_w+4), 
-              scale_ratio*m_h);
-        }
-
-
-        map=[]
-        function keyPush(evt){
-            evt = evt || event;
-            map[evt.keyCode] = evt.type == "keydown";
-            for(i=37;i<=40;i++){
-                if(map[i]){
-                    switch(i){
-                    /* 37->Left; 38-> Up; 39-> Right; 40->Down */
-                        case 37:
-                            xpos=xpos-15;
-                            action=1;
-                            break;
-                        case 39:
-                            xpos=xpos+15;
-                            action=2;
-                            break;
-                        case 40:
-                            action=0;
-                            break;
-                    }
-                }
-            }
-        }
-
-        function keyUp(evt){
-                evt = evt || event;
-                map[evt.keyCode] = false;
-                action = 0;
-        }
-
     </script>
 </body>
 </html>
