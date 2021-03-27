@@ -1,5 +1,5 @@
 # Games
-old games written in pure javascript and html within 200 lines
+old games written in pure javascript and html in around 150 lines.
 
 # Screenshots
 ![snake](https://user-images.githubusercontent.com/59250093/95171220-385c5080-07d3-11eb-82af-6cf6175e1d15.png)
