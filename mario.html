@@ -1,20 +1,14 @@
-<!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="utf-8">
   <title>mario</title>
-  <meta name="author" content="">
   <style>
   html, body{
    width:  100%;
    height: 100%;
    margin:0;
-   overflow: hidden;
-  }
+   overflow: hidden;}
   </style>
 </head>
-
 <body>
     <div style = "text-align:center;">
         <canvas id="canvas"></canvas>
@@ -31,7 +25,6 @@
         var mario= new Image();
         var mario_flip= new Image();
         var bg= new Image();
-
         mario.src = "assets/mario/smb2_heroes_sheet.png";
         mario_flip.src = "assets/mario/smb2_heroes_sheet_flipped.png";
         bg.src = "assets/mario/bg.png";
@@ -47,7 +40,6 @@
         m_vert_sp = 24; //mario vertical spacing
         l_vert_sp = 82; //luigi vertical spacing
         scale_ratio = 4;
-        ground_height = 75;
         xpos = cvs.width/2-25
         ypos = cvs.height-scale_ratio*m_h-cvs.height*8/100;
         y_on_g = ypos;
@@ -57,22 +49,20 @@
 
         frame = 1
         action = 1;
-        /* standing : 0
+        /* 
+        standing : 0
         running left: 1
         running right: 2
         jumping: 3
         */
-
 
         image = mario;
 
         //drawImage(image, x inside image, y ' ', width to crop, height ' ', x on canvas, y ' ', width on canvas, height ' ')
         function game(){
             ctx.drawImage(bg, 0, 0, cvs.width, cvs.height);
-
             xpos += xvel;
             ypos += yvel;
-
             if(xvel>0){
                 xvel-=4;
                 xvel = xvel>0?xvel:0;
@@ -81,7 +71,6 @@
                 xvel+=4;
                 xvel = xvel<0?xvel:0;
             }
-
             if(ypos<y_on_g){
                 yvel+=10
                 ypos = ypos>y_on_g?y_on_g:ypos;
@@ -96,7 +85,6 @@
                     frame=11;
                 }
             }
-
             draw_sprite()
 
             checkfor = [37, 38, 39, 40, 32];
@@ -110,7 +98,6 @@
                                 jump.play();
                                 jumped=1
                             }
-
                             if(action==-1){
                                 if(image==mario){
                                     frame=6
@@ -169,23 +156,6 @@
                     action=-1;
                     frame=frame==4?3:frame==10?11:frame;
                 }
-        }
-
-        function sample_print_sprites(){
-            x = 0;
-            y = 10;
-          for(var i=0;i<10;i++){
-              ctx.drawImage(mario, 16*i+14*i, m_vert_sp, w_m, h_m, x+w_m, y, w_m, h_m);
-              x = x+w_m;
-          }
-
-          //Luigi
-            x=0;
-            y=50;
-          for(var i=0;i<10;i++){
-              ctx.drawImage(mario, 16*i+14*i, l_vert_sp, w_l, h_l, x+w+l, y, w+l, h_l+5);
-              x = x+w_l;
-          }
         }
     </script>
 </body>
